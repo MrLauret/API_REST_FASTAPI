@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS equipos (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nombre TEXT NOT NULL,
+    tipo TEXT NOT NULL,
+    ip TEXT NOT NULL,
+    ubicacion TEXT NOT NULL
+)
