@@ -1,1 +1,0 @@
-Tienes que crear los endpoint, api/incidencias y api/tecnicos

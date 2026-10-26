@@ -1,4 +1,5 @@
 from enum import Enum
+from pydantic import BaseModel
 import datetime
 
 class Prioridad(Enum):
@@ -48,7 +49,7 @@ class Estado(Enum):
         except:
             return False
 
-class Incidencia():
+class Incidencia(BaseModel):
     def __init__(
         self, id:int, titulo:str, descripcion:str, equipo_id:int, prioridad:Estado, estado=Estado('abierta'), tecnico_id=None): 
         

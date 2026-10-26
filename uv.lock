@@ -41,6 +41,7 @@ dependencies = [
     { name = "dotenv" },
     { name = "fastapi" },
     { name = "pathlib" },
+    { name = "pydantic" },
 ]
 
 [package.metadata]
@@ -48,6 +49,7 @@ requires-dist = [
     { name = "dotenv", specifier = ">=0.9.9" },
     { name = "fastapi", specifier = ">=0.161.1" },
     { name = "pathlib", specifier = ">=1.0.1" },
+    { name = "pydantic", specifier = ">=2.14.1" },
 ]
 
 [[package]]

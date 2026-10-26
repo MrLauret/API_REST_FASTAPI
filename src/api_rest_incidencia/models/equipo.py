@@ -1,4 +1,6 @@
-class Equipo():
+from pydantic import BaseModel
+
+class Equipo(BaseModel):
     def __init__(self, nombre:str, tipo:str, ip:str, ubicacion:str, id=None):
         self.id = id | None
         self.nombre = nombre
