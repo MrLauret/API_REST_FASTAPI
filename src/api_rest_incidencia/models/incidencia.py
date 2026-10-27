@@ -23,13 +23,11 @@ class Prioridad(Enum):
             Prioridad(x.lower())
             return True
         except ValueError:
-            raise ValueError(
-                'Prioridad invalida'
-            )
+            return False
 
 class Estado(Enum):
     Abierta = 'abierta'
-    En_proceso = 'en_proceso'
+    En_proceso = 'en proceso'
     Cerrada = 'cerrada'
 
     @classmethod

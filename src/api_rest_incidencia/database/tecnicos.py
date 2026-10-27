@@ -28,3 +28,23 @@ class HanddlerTecnicoDB:
             return None
 
         return Tecnico(**dict(row))
+
+    def put(self, id, nombre, email, especialidad):
+        try:
+            self.cursor.execute('''
+                UPDATE incidencias
+                SET nombre = ?, email = ?, especialidad = ?
+                WHERE id = ?;
+
+            ''', (nombre, email, especialidad, id,)
+            )
+
+            if self.cursor.rowcount == 0:
+                return False
+
+            self.conn.commit()
+            
+            return True
+        except Exception as e:
+            print(f'Error en la base de datos {e}')
+            return None

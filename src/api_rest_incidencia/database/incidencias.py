@@ -1,5 +1,6 @@
 from api_rest_incidencia.models.incidencia import Incidencia
 from sqlite3 import Connection
+import datetime
 
 class HanddlerIncidenciaDB:
     def __init__(self, conn:Connection):
@@ -28,3 +29,23 @@ class HanddlerIncidenciaDB:
             return None
 
         return Incidencia(**dict(row))
+    
+    def put(self, id, titulo, descripcion, prioridad, estado, equipo_id, tecnico_id):
+        try:
+            self.cursor.execute('''
+                UPDATE incidencias
+                SET titulo = ?, descripcion = ?, prioridad = ?, estado = ?, equipo_id = ?, tecnico_id = ?, fecha_modificacion = ?
+                WHERE id = ?;
+
+            ''', (titulo, descripcion, prioridad, estado, equipo_id, tecnico_id, datetime.datetime.now(), id,)
+            )
+
+            if self.cursor.rowcount == 0:
+                return False
+
+            self.conn.commit()
+            
+            return True
+        except Exception as e:
+            print(f'Error en la base de datos {e}')
+            return None

@@ -28,3 +28,23 @@ class HanddlerEquipoDB:
             return None
 
         return Equipo(**dict(row))
+
+    def put(self, id, nombre, tipo, ip, ubicacion):
+        try:
+            self.cursor.execute('''
+                UPDATE incidencias
+                SET nombre = ?, tipo = ?, ip = ?, ubicacion = ?
+                WHERE id = ?;
+
+            ''', (nombre, tipo, ip, ubicacion, id,)
+            )
+
+            if self.cursor.rowcount == 0:
+                return False
+
+            self.conn.commit()
+            
+            return True
+        except Exception as e:
+            print(f'Error en la base de datos {e}')
+            return None

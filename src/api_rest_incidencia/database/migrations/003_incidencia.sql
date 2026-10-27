@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS incidencia (
+CREATE TABLE IF NOT EXISTS incidencias (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     titulo TEXT NOT NULL,
     descripcion TEXT,
