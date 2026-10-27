@@ -1,9 +1,10 @@
 from fastapi import APIRouter, Request, requests, status
-from api_rest_incidencia.database import equipo
+from api_rest_incidencia.database import equipos
 from api_rest_incidencia.models.equipo import Equipo
+from pydantic import BaseModel
 
 router = APIRouter(
-    prefix="/equipos",
+    prefix="/api/equipos",
     tags=["equipos"]
 )
 

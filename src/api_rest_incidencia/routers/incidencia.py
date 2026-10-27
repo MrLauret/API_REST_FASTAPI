@@ -4,7 +4,7 @@ from api_rest_incidencia.models.incidencia import Incidencia, Prioridad, Estado
 from pydantic import BaseModel
 
 router = APIRouter(
-    prefix="/incidencias",
+    prefix="/api/incidencias",
     tags=["incidencias"]
 )
 

@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from api_rest_incidencia.database import database, equipos, incidencias, tecnicos
 from api_rest_incidencia.routers import equipo, incidencia, tecnico
 
+app = FastAPI()
 
 def main() -> None:
     load_dotenv()
@@ -13,8 +14,7 @@ def main() -> None:
     conn = database.get_db_connection(database_name)
     cursor = conn.cursor()
     database.db_migrate(cursor)
-
-    app = FastAPI()
+    
     app.add_middleware(
         CORSMiddleware,
         allow_origins=["*"],
@@ -31,9 +31,9 @@ def main() -> None:
     app.state.handdler_equipo_db = HanddlerEquipoDB
     app.state.handdler_tecnico_db = HanddlerTecnicoDB
 
-    app.include_router(routers.incidencia, "/api")
-    app.include_router(routers.tecnico, "/api")
-    app.include_router(routers.equipo, "/api")
+    app.include_router(incidencia.router)
+    app.include_router(tecnico.router)
+    app.include_router(equipo.router)
 
 if __name__ == "__main__":
     main()
