@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS incidencias (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id SERIAL PRIMARY KEY,
     titulo TEXT NOT NULL,
     descripcion TEXT,
     prioridad TEXT NOT NULL,

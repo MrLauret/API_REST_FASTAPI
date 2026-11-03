@@ -5,14 +5,20 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from api_rest_incidencia import database, routers
-from api_rest_incidencia.config import log_config
+from config import log_config
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     load_dotenv()
-    database_name = os.getenv('db_name')
+    envs = {
+        "host": os.getenv('host'),
+        "db_name": os.getenv('db_name'),
+        "db_password": os.getenv('db_password'),
+        "db_port": os.getenv('db_port'),
+        "db_user": os.getenv('db_user')
+    }
 
-    conn = database.get_db_connection(database_name)
+    conn = database.get_db_connection(**envs)
     cursor = conn.cursor()
     database.db_migrate(cursor)
     

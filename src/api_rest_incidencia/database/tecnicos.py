@@ -9,7 +9,7 @@ class HanddlerTecnicoDB:
 
     def create(self, Tecnico:Tecnico):
         self.cursor.execute(
-            'INSERT INTO tecnicos (nombre, especialidad, email) VALUES (?, ?, ?)', 
+            'INSERT INTO tecnicos (nombre, especialidad, email) VALUES (%s, %s, %s)', 
             (Tecnico.nombre, Tecnico.especialidad, Tecnico.email,)
         )
 
@@ -22,7 +22,7 @@ class HanddlerTecnicoDB:
         return Tecnico
 
     def get_by_id(self, id):
-        self.cursor.execute('SELECT * FROM tecnicos WHERE id = ?', (id,))
+        self.cursor.execute('SELECT * FROM tecnicos WHERE id = %s', (id,))
         row = self.cursor.fetchone()
 
         if row == None:
@@ -34,8 +34,8 @@ class HanddlerTecnicoDB:
         try:
             self.cursor.execute('''
                 UPDATE tecnicos
-                SET nombre = ?, email = ?, especialidad = ?
-                WHERE id = ?;
+                SET nombre = %s, email = %s, especialidad = %s
+                WHERE id = %s;
 
             ''', (nombre, email, especialidad, id,)
             )
@@ -44,6 +44,7 @@ class HanddlerTecnicoDB:
                 return False
 
             self.conn.commit()
+            logging.info(f"Tecnico con id: {id} actualizado")
             
             return True
         except Exception as e:
@@ -53,13 +54,14 @@ class HanddlerTecnicoDB:
     def delete(self, id):
         try:
             self.cursor.execute('''
-                DELETE FROM tecnicos WHERE id = ?;
+                DELETE FROM tecnicos WHERE id = %s;
             ''', (id,))
 
             if self.cursor.rowcount == 0:
                 return False
             
             self.conn.commit()
+            logging.info(f"Tecnico con id: {id} borrado")
 
             return True
         except Exception as e:

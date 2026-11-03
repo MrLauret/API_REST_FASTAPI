@@ -9,7 +9,7 @@ class HanddlerEquipoDB:
 
     def create(self, Equipo:Equipo):
         self.cursor.execute(
-            'INSERT INTO equipos (nombre, tipo, ip, ubicacion) VALUES (?, ?, ?, ?)', 
+            'INSERT INTO equipos (nombre, tipo, ip, ubicacion) VALUES (%s, %s, %s, %s)', 
             (Equipo.nombre, Equipo.tipo, Equipo.ip, Equipo.ubicacion,)
         )
 
@@ -22,7 +22,7 @@ class HanddlerEquipoDB:
         return Equipo
 
     def get_by_id(self, id):
-        self.cursor.execute('SELECT * FROM equipos WHERE id = ?', (id,))
+        self.cursor.execute('SELECT * FROM equipos WHERE id = %s', (id,))
         row = self.cursor.fetchone()
 
         if row == None:
@@ -34,8 +34,8 @@ class HanddlerEquipoDB:
         try:
             self.cursor.execute('''
                 UPDATE equipos
-                SET nombre = ?, tipo = ?, ip = ?, ubicacion = ?
-                WHERE id = ?;
+                SET nombre = %s, tipo = %s, ip = %s, ubicacion = %s
+                WHERE id = %s;
 
             ''', (nombre, tipo, ip, ubicacion, id,)
             )
@@ -44,6 +44,7 @@ class HanddlerEquipoDB:
                 return False
 
             self.conn.commit()
+            logging.info(f"Equipo con id: {id} actualizado")
             
             return True
         except Exception as e:
@@ -53,13 +54,14 @@ class HanddlerEquipoDB:
     def delete(self, id):
         try:
             self.cursor.execute('''
-                DELETE FROM equipos WHERE id = ?;
+                DELETE FROM equipos WHERE id = %s;
             ''', (id,))
 
             if self.cursor.rowcount == 0:
                 return False
             
             self.conn.commit()
+            logging.info(f"Equipo con id: {id} borrado")
 
             return True
         except Exception as e:
