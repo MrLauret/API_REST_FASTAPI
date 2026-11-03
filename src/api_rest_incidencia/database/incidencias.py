@@ -49,3 +49,19 @@ class HanddlerIncidenciaDB:
         except Exception as e:
             print(f'Error en la base de datos {e}')
             return None
+    
+    def delete(self, id):
+        try:
+            self.cursor.execute('''
+                DELETE FROM incidencias WHERE id = ?;
+            ''', (id,))
+
+            if self.cursor.rowcount == 0:
+                return False
+            
+            self.conn.commit()
+
+            return True
+        except Exception as e:
+            print(f'Error en la base de datos {e}')
+            return None

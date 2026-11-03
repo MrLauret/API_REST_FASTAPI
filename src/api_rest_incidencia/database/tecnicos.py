@@ -32,7 +32,7 @@ class HanddlerTecnicoDB:
     def put(self, id, nombre, email, especialidad):
         try:
             self.cursor.execute('''
-                UPDATE incidencias
+                UPDATE tecnicos
                 SET nombre = ?, email = ?, especialidad = ?
                 WHERE id = ?;
 
@@ -44,6 +44,22 @@ class HanddlerTecnicoDB:
 
             self.conn.commit()
             
+            return True
+        except Exception as e:
+            print(f'Error en la base de datos {e}')
+            return None
+    
+    def delete(self, id):
+        try:
+            self.cursor.execute('''
+                DELETE FROM tecnicos WHERE id = ?;
+            ''', (id,))
+
+            if self.cursor.rowcount == 0:
+                return False
+            
+            self.conn.commit()
+
             return True
         except Exception as e:
             print(f'Error en la base de datos {e}')
