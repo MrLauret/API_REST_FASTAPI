@@ -18,7 +18,7 @@ def get_handdler(request:Request) -> equipo.HanddlerEquipoDB:
     return request.app.state.handdler_equipo_db
 
 @router.post("/")
-async def crear_equipo(payload:Incidencia, request:Request):
+async def crear_equipo(payload:PutRequest, request:Request):
     handdler = get_handdler(request)
 
     result = handdler.create(payload)

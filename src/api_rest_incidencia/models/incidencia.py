@@ -58,24 +58,24 @@ class Incidencia(BaseModel):
         self.estado = estado
         self.equipo_id = equipo_id
         self.tecnico_id = tecnico_id
-        self.fecha_creacion = datetime.datetime.now()
-        self.fecha_modificacion = datetime.datetime.now()
+        self.fecha_creacion = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        self.fecha_modificacion = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
     def cambiar_estado(self, nuevo_estado:Estado):
         self.estado = nuevo_estado
-        self.fecha_modificacion = datetime.datetime.now()
+        self.fecha_modificacion = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     
     def cambiar_prioridad(self, nueva_prioridad:Prioridad):
         self.prioridad = nueva_prioridad
-        self.fecha_modificacion = datetime.datetime.now()
+        self.fecha_modificacion = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     
     def asignar_tecnico(self, id):
         self.tecnico_id = id
-        self.fecha_modificacion = datetime.datetime.now()
+        self.fecha_modificacion = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     
     def cerrar(self):
         self.estado = Estado('cerrada')
-        self.fecha_modificacion = datetime.datetime.now()
+        self.fecha_modificacion = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     
     def to_dict(self):
         return {

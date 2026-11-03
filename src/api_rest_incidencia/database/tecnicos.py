@@ -1,5 +1,6 @@
 from api_rest_incidencia.models.tecnico import Tecnico
 from sqlite3 import Connection
+import logging
 
 class HanddlerTecnicoDB:
     def __init__(self, conn:Connection):
@@ -16,7 +17,7 @@ class HanddlerTecnicoDB:
 
         Tecnico.id = cursor.lastrowid
 
-        print(f'Técnico {Tecnico.nombre} creado')
+        logging.info(f'Técnico {Tecnico.nombre} creado')
 
         return Tecnico
 
@@ -46,7 +47,7 @@ class HanddlerTecnicoDB:
             
             return True
         except Exception as e:
-            print(f'Error en la base de datos {e}')
+            logging.error(f'Error en la base de datos {e}')
             return None
     
     def delete(self, id):
@@ -62,5 +63,5 @@ class HanddlerTecnicoDB:
 
             return True
         except Exception as e:
-            print(f'Error en la base de datos {e}')
+            logging.error(f'Error en la base de datos {e}')
             return None

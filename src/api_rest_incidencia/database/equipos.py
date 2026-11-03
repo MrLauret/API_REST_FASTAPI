@@ -1,5 +1,6 @@
 from api_rest_incidencia.models.equipo import Equipo
 from sqlite3 import Connection
+import logging
 
 class HanddlerEquipoDB:
     def __init__(self, conn:Connection):
@@ -16,7 +17,7 @@ class HanddlerEquipoDB:
 
         Equipo.id = cursor.lastrowid
 
-        print(f'Equipo {Equipo.nombre} creado')
+        logging.info(f'Equipo {Equipo.nombre} creado')
 
         return Equipo
 
@@ -46,7 +47,7 @@ class HanddlerEquipoDB:
             
             return True
         except Exception as e:
-            print(f'Error en la base de datos {e}')
+            logging.error(f'Error en la base de datos {e}')
             return None
     
     def delete(self, id):
@@ -62,5 +63,5 @@ class HanddlerEquipoDB:
 
             return True
         except Exception as e:
-            print(f'Error en la base de datos {e}')
+            logging.error(f'Error en la base de datos {e}')
             return None

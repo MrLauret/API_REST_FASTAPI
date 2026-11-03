@@ -20,7 +20,7 @@ def get_handdler(request:Request) -> incidencias.HanddlerIncidenciaDB:
     return request.app.state.handdler_incidencia_db
 
 @router.post("/")
-async def crear_incidencia(payload:Incidencia, request:Request):
+async def crear_incidencia(payload:PutRequest, request:Request):
     handdler = get_handdler(request)
 
     result = handdler.create(payload)

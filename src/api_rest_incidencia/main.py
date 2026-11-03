@@ -1,13 +1,14 @@
 import os
+import logging
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
-from api_rest_incidencia.database import database, equipos, incidencias, tecnicos
-from api_rest_incidencia.routers import equipo, incidencia, tecnico
+from api_rest_incidencia import database, routers
+from api_rest_incidencia.config import log_config
 
-app = FastAPI()
-
-def main() -> None:
+@asynccontextmanager
+async def lifespan(app: FastAPI):
     load_dotenv()
     database_name = os.getenv('db_name')
 
@@ -15,25 +16,25 @@ def main() -> None:
     cursor = conn.cursor()
     database.db_migrate(cursor)
     
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=["*"],
-        allow_methods=["*"],
-        allow_headers=["*"],
+    app.state.handdler_incidencia_db = database.incidencias.HanddlerIncidenciaDB(conn)
+    app.state.handdler_equipo_db = database.equipos.HanddlerEquipoDB(conn)
+    app.state.handdler_tecnico_db = database.tecnicos.HanddlerTecnicoDB(conn)
+    
+    yield
+    
+    conn.close()
 
-    )
+logging.config.dictConfig(log_config.LOGGING_CONFIG)
 
-    HanddlerIncidenciaDB = incidencias.HanddlerIncidenciaDB(conn)
-    HanddlerEquipoDB = equipos.HanddlerEquipoDB(conn)
-    HanddlerTecnicoDB = tecnicos.HanddlerTecnicoDB
+app = FastAPI(lifespan=lifespan)
 
-    app.state.handdler_incidencia_db = HanddlerIncidenciaDB
-    app.state.handdler_equipo_db = HanddlerEquipoDB
-    app.state.handdler_tecnico_db = HanddlerTecnicoDB
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-    app.include_router(incidencia.router)
-    app.include_router(tecnico.router)
-    app.include_router(equipo.router)
-
-if __name__ == "__main__":
-    main()
+app.include_router(routers.incidencia.router)
+app.include_router(routers.tecnico.router)
+app.include_router(routers.equipo.router)

@@ -1,0 +1,1 @@
+python -m uvicorn api_rest_incidencia.main:app --reload
