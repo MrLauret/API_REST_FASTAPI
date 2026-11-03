@@ -9,15 +9,16 @@ class HanddlerTecnicoDB:
 
     def create(self, Tecnico:Tecnico):
         self.cursor.execute(
-            'INSERT INTO tecnicos (nombre, especialidad, email) VALUES (%s, %s, %s)', 
+            'INSERT INTO tecnicos (nombre, especialidad, email) VALUES (%s, %s, %s) RETURNING id', 
             (Tecnico.nombre, Tecnico.especialidad, Tecnico.email,)
         )
 
+        generated_id = self.cursor.fetchone()[0]
         self.conn.commit()
 
-        Tecnico.id = cursor.lastrowid
+        Tecnico.id = generated_id
 
-        logging.info(f'Técnico {Tecnico.nombre} creado')
+        logging.info(f'Técnico {Tecnico.nombre} creado con id {generated_id}')
 
         return Tecnico
 

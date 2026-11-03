@@ -9,15 +9,16 @@ class HanddlerEquipoDB:
 
     def create(self, Equipo:Equipo):
         self.cursor.execute(
-            'INSERT INTO equipos (nombre, tipo, ip, ubicacion) VALUES (%s, %s, %s, %s)', 
+            'INSERT INTO equipos (nombre, tipo, ip, ubicacion) VALUES (%s, %s, %s, %s) RETURNING id', 
             (Equipo.nombre, Equipo.tipo, Equipo.ip, Equipo.ubicacion,)
         )
 
+        generated_id = self.cursor.fetchone()[0]
         self.conn.commit()
 
-        Equipo.id = cursor.lastrowid
+        Equipo.id = generated_id
 
-        logging.info(f'Equipo {Equipo.nombre} creado')
+        logging.info(f'Equipo {Equipo.nombre} creado con id {generated_id}')
 
         return Equipo
 
@@ -36,7 +37,6 @@ class HanddlerEquipoDB:
                 UPDATE equipos
                 SET nombre = %s, tipo = %s, ip = %s, ubicacion = %s
                 WHERE id = %s;
-
             ''', (nombre, tipo, ip, ubicacion, id,)
             )
 

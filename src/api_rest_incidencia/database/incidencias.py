@@ -1,5 +1,6 @@
-from api_rest_incidencia.models.incidencia import Incidencia
+from api_rest_incidencia.models import Incidencia, errors
 from psycopg.connection import Connection
+from api_rest_incidencia.database import equipos, tecnicos
 import datetime
 import logging
 
@@ -8,32 +9,36 @@ class HanddlerIncidenciaDB:
         self.conn = conn
         self.cursor = conn.cursor()
 
-    def create(self, incidencia:Incidencia) -> Incidencia:
+    def create(self, titulo, descripcion, prioridad, estado, equipo_id, tecnico_id) -> Incidencia | NoEquipo:
+
+        if not equipos.HanddlerEquipoDB(self.conn).get_by_id(equipo_id): 
+            return NoEquipo
+        
+        fecha_actual = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
         self.cursor.execute(
             '''
             INSERT INTO incidencias
-            (titulo, descripcion, prioridad, estado, equipo_id, tecnico_id, fecha_creacion, fecha_modificacion)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            (titulo, descripcion, prioridad, estado, equipo_id, fecha_creacion, fecha_modificacion)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
             RETURNING id''', 
             (
-                incidencia.titulo,
-                incidencia.descripcion,
-                incidencia.prioridad,
-                incidencia.estado,
-                incidencia.equipo_id,
-                incidencia.tecnico_id,
-                incidencia.fecha_creacion,
-                incidencia.fecha_modificacion,
+                titulo,
+                descripcion,
+                prioridad,
+                estado,
+                equipo_id,
+                fecha_actual,
+                fecha_actual,
             )
         )
 
         generated_id = self.cursor.fetchone()[0]
         self.conn.commit()
 
-        incidencia.id = generated_id
+        id = generated_id
 
-        logging.info(f'Incidencia {incidencia.nombre} creada con id {generated_id}')
+        logging.info(f'Incidencia {nombre} creada con id {generated_id}')
 
         return incidencia
 
@@ -48,9 +53,15 @@ class HanddlerIncidenciaDB:
 
         return Incidencia(**row)
     
-    def put(self, id, titulo:str, descripcion:str, prioridad:str, estado:str, equipo_id, tecnico_id) -> bool:
+    def put(self, id, titulo:str, descripcion:str, prioridad:str, estado:str, equipo_id, tecnico_id) -> bool | NoEquipo | NoTecnico:
         try:
             fecha_actual = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+            if not equipos.HanddlerEquipoDB(self.conn).get_by_id(equipo_id): 
+                return errors.NoEquipo
+            
+            if type(tecnico_id) != None and not tecnicos.HanddlerTecnicoDB(self.conn).get_by_id(tecnico_id):
+                return errors.NoTecnico
 
             self.cursor.execute('''
                 UPDATE incidencias
@@ -108,3 +119,9 @@ class HanddlerIncidenciaDB:
         except Exception as e:
             logging.error(f'Error en la base de datos {e}')
             return None
+    
+    def asignar_tecnico(self, id, id_tecnico) -> bool | errors.NoTecnico:
+        try:
+            pass
+        except:
+            pass

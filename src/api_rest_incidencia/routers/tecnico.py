@@ -24,7 +24,7 @@ async def crear_tecnico(payload:PutRequest, request:Request):
 
     return Response(result.to_dict(), status.HTTP_201_CREATED)
 
-@router.get("/{tecnico_id}")
+@router.get("/{tecnico_id}/")
 async def get_by_id(tecnico_id: int, request:Request):
     handdler = get_handdler(request)
 
@@ -35,7 +35,7 @@ async def get_by_id(tecnico_id: int, request:Request):
     
     return Response(result.to_dict(), status.HTTP_200_OK)
 
-@router.put("/{tecnico_id}")
+@router.put("/{tecnico_id}/")
 async def update(tecnico_id: int, put_req:PutRequest, request:Request):
     handdler = get_handdler(request)
     result = handdler.put(tecnico_id, **put_req)
