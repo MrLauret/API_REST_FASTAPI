@@ -55,8 +55,6 @@ class HanddlerIncidenciaDB:
     
     def put(self, id, titulo:str, descripcion:str, prioridad:str, estado:str, equipo_id, tecnico_id) -> bool | NoEquipo | NoTecnico:
         try:
-            fecha_actual = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-
             if not equipos.HanddlerEquipoDB(self.conn).get_by_id(equipo_id): 
                 return errors.NoEquipo
             
@@ -68,10 +66,11 @@ class HanddlerIncidenciaDB:
                 SET titulo = %s, descripcion = %s, prioridad = %s, estado = %s, equipo_id = %s, tecnico_id = %s, fecha_modificacion = %s
                 WHERE id = %s;
 
-            ''', (titulo, descripcion, prioridad, estado, equipo_id, tecnico_id, fecha_actual, id,)
+            ''', (titulo, descripcion, prioridad, estado, equipo_id, tecnico_id, self.fecha_actual(), id,)
             )
 
             if self.cursor.rowcount == 0:
+                self.cursor.rollback()
                 return False
 
             self.conn.commit()
@@ -79,7 +78,7 @@ class HanddlerIncidenciaDB:
             
             return True
         except Exception as e:
-            logging.error(f'Error en la base de datos {e}')
+            logging.error(f'Error en la base de datos {e} el {self.fecha_actual()}')
             return None
     
     def delete(self, id):
@@ -89,6 +88,7 @@ class HanddlerIncidenciaDB:
             ''', (id,))
 
             if self.cursor.rowcount == 0:
+                self.cursor.rollback()
                 return False
             
             self.conn.commit()
@@ -96,20 +96,19 @@ class HanddlerIncidenciaDB:
 
             return True
         except Exception as e:
-            logging.error(f'Error en la base de datos {e}')
+            logging.error(f'Error en la base de datos {e} el {self.fecha_actual()}')
             return None
     
     def cerrar(self, id):
         try:
-            fecha_actual = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-
             self.cursor.execute('''
                 UPDATE incidencias
                 SET fecha_modificacion = %s, estado = 'cerrada'
                 WHERE id = %s;
-            ''', (fecha_actual, id,))
+            ''', (self.fecha_actual(), id,))
 
             if self.cursor.rowcount == 0:
+                self.cursor.rollback()
                 return False
             
             self.conn.commit()
@@ -117,11 +116,29 @@ class HanddlerIncidenciaDB:
 
             return True
         except Exception as e:
-            logging.error(f'Error en la base de datos {e}')
+            logging.error(f'Error en la base de datos {e} el {self.fecha_actual()}')
             return None
     
     def asignar_tecnico(self, id, id_tecnico) -> bool | errors.NoTecnico:
         try:
-            pass
-        except:
-            pass
+            if not tecnicos.HanddlerTecnicoDB(self.conn).get_by_id(id_tecnico):
+                return errors.NoTecnico()
+
+            self.cursor.execute('''
+                UPDATE incidencias
+                SET fecha_modificacion = %s, tecnico_id = %s
+                WHERE id = %s;
+            ''', (self.fecha_actual(), id_tecnico, id,))
+
+            if self.cursor.rowcount == 0:
+                self.cursor.rollback()
+                return False
+            
+            self.cursor.commit()
+
+        except Exception as e:
+            logging.error(f'Error en la base de datos {e} el {self.fecha_actual()}')
+            return None
+    
+    def fecha_actual():
+        return datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
