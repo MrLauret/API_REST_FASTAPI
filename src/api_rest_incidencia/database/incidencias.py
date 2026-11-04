@@ -1,4 +1,4 @@
-from api_rest_incidencia.models import Incidencia, errors
+from api_rest_incidencia.models import incidencia, errors
 from psycopg.connection import Connection
 from api_rest_incidencia.database import equipos, tecnicos
 import datetime
@@ -9,10 +9,10 @@ class HanddlerIncidenciaDB:
         self.conn = conn
         self.cursor = conn.cursor()
 
-    def create(self, titulo, descripcion, prioridad, estado, equipo_id, tecnico_id) -> Incidencia | NoEquipo:
+    def create(self, titulo, descripcion, prioridad, estado, equipo_id, tecnico_id) -> incidencia.Incidencia | errors.NoEquipo:
 
         if not equipos.HanddlerEquipoDB(self.conn).get_by_id(equipo_id): 
-            return NoEquipo
+            return errors.NoEquipo
         
         fecha_actual = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
@@ -38,11 +38,11 @@ class HanddlerIncidenciaDB:
 
         id = generated_id
 
-        logging.info(f'Incidencia {nombre} creada con id {generated_id}')
+        logging.info(f'Incidencia {titulo} creada con id {generated_id}')
 
-        return incidencia
+        return incidencia.Incidencia(id=id, titulo=titulo, descripcion=descripcion, prioridad=prioridad, estado=estado, equipo_id=equipo_id, tecnico_id=tecnico_id)
 
-    def get_by_id(self, id) -> Incidencia | None:
+    def get_by_id(self, id) -> incidencia.Incidencia | None:
         self.cursor.execute(
             'SELECT * FROM incidencias WHERE id = %s', (id,)
         )
@@ -51,9 +51,9 @@ class HanddlerIncidenciaDB:
         if row == None:
             return None
 
-        return Incidencia(**row)
+        return incidencia.Incidencia(**row)
     
-    def put(self, id, titulo:str, descripcion:str, prioridad:str, estado:str, equipo_id, tecnico_id) -> bool | NoEquipo | NoTecnico:
+    def put(self, id, titulo:str, descripcion:str, prioridad:str, estado:str, equipo_id, tecnico_id) -> bool | errors.NoEquipo | errors.NoTecnico:
         try:
             if not equipos.HanddlerEquipoDB(self.conn).get_by_id(equipo_id): 
                 return errors.NoEquipo
