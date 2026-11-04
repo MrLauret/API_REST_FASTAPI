@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Request, Response, status
+from fastapi.responses import JSONResponse
 from api_rest_incidencia.database import equipos
 from api_rest_incidencia.models.equipo import Equipo
 from api_rest_incidencia.database.equipos import HanddlerEquipoDB
@@ -26,7 +27,9 @@ async def crear_equipo(payload:PutRequest, request:Request):
 
     result = handdler.create(payload)
 
-    return Response(result.dict(), status.HTTP_201_CREATED)
+    if result is None:
+        return HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
+    return JSONResponse({"id": result}, status.HTTP_201_CREATED)
 
 @router.get("/{equipo_id}/")
 async def get_by_id(equipo_id: int, request:Request):

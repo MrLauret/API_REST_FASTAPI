@@ -9,12 +9,10 @@ class HanddlerIncidenciaDB:
         self.conn = conn
         self.cursor = conn.cursor()
 
-    def create(self, titulo, descripcion, prioridad, estado, equipo_id, tecnico_id) -> incidencia.Incidencia | errors.NoEquipo:
+    def create(self, put_req):
 
-        if not equipos.HanddlerEquipoDB(self.conn).get_by_id(equipo_id): 
-            return errors.NoEquipo
-        
-        fecha_actual = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        if equipos.HanddlerEquipoDB(self.conn).get_by_id(put_req.equipo_id) == None: 
+            return errors.NoEquipo()
 
         self.cursor.execute(
             '''
@@ -23,24 +21,22 @@ class HanddlerIncidenciaDB:
             VALUES (%s, %s, %s, %s, %s, %s, %s)
             RETURNING id''', 
             (
-                titulo,
-                descripcion,
-                prioridad,
-                estado,
-                equipo_id,
-                fecha_actual,
-                fecha_actual,
+                put_req.titulo,
+                put_req.descripcion,
+                put_req.prioridad,
+                put_req.estado,
+                put_req.equipo_id,
+                self.fecha_actual(),
+                self.fecha_actual(),
             )
         )
 
-        generated_id = self.cursor.fetchone()[0]
+        generated_id = self.cursor.fetchone()["id"]
         self.conn.commit()
 
-        id = generated_id
+        logging.info(f'Incidencia {put_req.titulo} creada con id {generated_id}')
 
-        logging.info(f'Incidencia {titulo} creada con id {generated_id}')
-
-        return incidencia.Incidencia(id=id, titulo=titulo, descripcion=descripcion, prioridad=prioridad, estado=estado, equipo_id=equipo_id, tecnico_id=tecnico_id)
+        return generated_id
 
     def get_by_id(self, id) -> incidencia.Incidencia | None:
         self.cursor.execute(
@@ -140,5 +136,6 @@ class HanddlerIncidenciaDB:
             logging.error(f'Error en la base de datos {e} el {self.fecha_actual()}')
             return None
     
+    @staticmethod
     def fecha_actual():
         return datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')

@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Request, Response, status
+from fastapi import APIRouter, Request, Response, status, HTTPException
+from fastapi.responses import JSONResponse
 from api_rest_incidencia.database import tecnicos
 from api_rest_incidencia.models.tecnico import Tecnico
 from pydantic import BaseModel
@@ -12,16 +13,18 @@ class PutRequest(BaseModel):
     nombre: str
     email: str
     especialidad: str
-    
+
+def get_handler(request:Request) -> incidencias.HanddlerIncidenciaDB:
+    return request.app.state.handdler_tecnico_db
+
 @router.post("/")
 async def crear_tecnico(payload: PutRequest, request: Request):
     handdler = get_handler(request)
-
     result = handdler.create(payload)
 
     if result is None:
-        return Response(status_code=status.HTTP_400_BAD_REQUEST)
-    return Response(result.to_dict(), status.HTTP_201_CREATED)
+        return HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
+    return JSONResponse({"id": result}, status.HTTP_201_CREATED)
 
 @router.get("/{tecnico_id}/")
 async def get_by_id(tecnico_id: int, request: Request):

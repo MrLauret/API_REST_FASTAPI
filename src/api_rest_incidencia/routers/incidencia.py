@@ -16,25 +16,24 @@ class AsignarTecnico(BaseModel):
 
 class PutRequest(BaseModel):
     titulo: str
-    descripcion: Optional[str]
+    descripcion: str | None
     prioridad: str
     estado: str
     equipo_id: int
-    tecnico_id: Optional[int]
+    tecnico_id: int | None
 
 def get_handler(request:Request) -> incidencias.HanddlerIncidenciaDB:
     return request.app.state.handdler_incidencia_db
 
-
 @router.post("/")
 async def crear_incidencia(payload:PutRequest, request:Request):
     handdler = get_handler(request)
+    result = handdler.create(payload)
 
-    result = handdler.create(**payload.dict())
+    if isinstance(result, NoEquipo):
+        return JSONResponse(content={"Error": "Ningun equipo fue encontrado"}, status_code=status.HTTP_404_NOT_FOUND)
 
-    if hasattr(result, "to_dict") and callable(result.to_dict):
-        return JSONResponse(result.to_dict(), status_code=status.HTTP_201_CREATED)
-    return JSONResponse(content={"error": "Result object does not implement to_dict()"}, status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    return JSONResponse({"id": result}, status_code=status.HTTP_201_CREATED)
 
 @router.get("/{incidencia_id}/")
 async def get_by_id(incidencia_id: int, request:Request):

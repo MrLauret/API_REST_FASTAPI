@@ -7,20 +7,18 @@ class HanddlerEquipoDB:
         self.conn = conn
         self.cursor = conn.cursor()
 
-    def create(self, Equipo:Equipo):
+    def create(self, put_req):
         self.cursor.execute(
             'INSERT INTO equipos (nombre, tipo, ip, ubicacion) VALUES (%s, %s, %s, %s) RETURNING id', 
-            (Equipo.nombre, Equipo.tipo, Equipo.ip, Equipo.ubicacion,)
+            (put_req.nombre, put_req.tipo, put_req.ip, put_req.ubicacion,)
         )
 
-        generated_id = self.cursor.fetchone()[0]
+        generated_id = self.cursor.fetchone()["id"]
         self.conn.commit()
 
-        Equipo.id = generated_id
+        logging.info(f'Equipo {put_req.nombre} creado con id {generated_id}')
 
-        logging.info(f'Equipo {Equipo.nombre} creado con id {generated_id}')
-
-        return Equipo
+        return generated_id
 
     def get_by_id(self, id):
         self.cursor.execute('SELECT * FROM equipos WHERE id = %s', (id,))
