@@ -230,8 +230,3 @@ curl -X PATCH http://127.0.0.1:8000/api/incidencias/1/cerrar/
 ## Limitaciones conocidas
 
 - La API no expone rutas `DELETE`, aunque existan métodos de borrado en los handlers de base de datos.
-- El handler de `GET /api/equipos/` consulta actualmente la tabla `tecnicos`; por ello, ese endpoint puede devolver técnicos en lugar de equipos hasta corregir la consulta.
-- `POST /api/incidencias/` recibe `tecnico_id`, pero la consulta de inserción actual no lo guarda. Para asignar un técnico después de crear la incidencia está disponible la ruta `PATCH .../asignar_tecnico/`, cuya persistencia debe verificarse en la implementación actual.
-- Las fechas de incidencias se almacenan como texto en PostgreSQL, mientras que la serialización del modelo de detalle las trata como objetos de fecha. La respuesta de `GET /api/incidencias/{incidencia_id}/` puede requerir ajustar esa conversión.
-- Los endpoints de detalle de equipos y técnicos construyen respuestas directamente con `Response` a partir de diccionarios; si la serialización falla, deben cambiarse a una respuesta JSON.
-
