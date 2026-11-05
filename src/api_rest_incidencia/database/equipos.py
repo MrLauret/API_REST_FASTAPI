@@ -68,7 +68,7 @@ class handlerEquipoDB:
 
     def lista(self):
         self.cursor.execute('''
-            SELECT * FROM tecnicos;
+            SELECT * FROM equipos;
         ''')
 
         return self.cursor.fetchall()

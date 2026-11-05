@@ -38,12 +38,9 @@ async def get_by_id(tecnico_id: int, request: Request):
 
     result = handler.get_by_id(tecnico_id)
     if result is None:
-        return Response(status_code=status.HTTP_404_NOT_FOUND)
+        return HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     
-    if hasattr(result, "to_dict") and callable(result.to_dict):
-        return Response(result.to_dict(), status.HTTP_200_OK)
-    else:
-        return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    return JSONResponse(result, status.HTTP_200_OK)
 
 @router.put("/{tecnico_id}/")
 async def update(tecnico_id: int, put_req: PutRequest, request: Request):
@@ -52,17 +49,8 @@ async def update(tecnico_id: int, put_req: PutRequest, request: Request):
     result = handler.put(tecnico_id, **put_req.dict())
 
     if not result:
-        return Response(status_code=status.HTTP_404_NOT_FOUND)
+        return HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     elif result is None:
-        return Response(status_code=status.HTTP_304_NOT_MODIFIED)
+        return JSONResponse({"Error": "Ningun tecnico fue encontrado"}, status_code=status.HTTP_304_NOT_MODIFIED)
     
-    if hasattr(result, "to_dict") and callable(result.to_dict):
-        return Response(result.to_dict(), status.HTTP_200_OK)
-    else:
-        return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    
-    if hasattr(result, "to_dict") and callable(result.to_dict):
-        return Response(result.to_dict(), status.HTTP_200_OK)
-    else:
-        return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
     return JSONResponse({"Mensaje": "Editado con exito"}, status_code=status.HTTP_200_OK)

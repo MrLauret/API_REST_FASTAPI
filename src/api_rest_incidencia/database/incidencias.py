@@ -17,7 +17,7 @@ class handlerIncidenciaDB:
         self.cursor.execute(
             '''
             INSERT INTO incidencias
-            (titulo, descripcion, prioridad, estado, equipo_id, fecha_creacion, fecha_modificacion)
+            (titulo, descripcion, prioridad, estado, equipo_id, tecnico_id, fecha_creacion, fecha_modificacion)
             VALUES (%s, %s, %s, %s, %s, %s, %s)
             RETURNING id''', 
             (
@@ -26,6 +26,7 @@ class handlerIncidenciaDB:
                 put_req.prioridad,
                 put_req.estado,
                 put_req.equipo_id,
+                put_req.tecnico_id,
                 self.fecha_actual(),
                 self.fecha_actual(),
             )
