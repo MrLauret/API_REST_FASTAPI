@@ -17,12 +17,11 @@ class PutRequest(BaseModel):
     ubicacion: str
 
 
-
 def get_handler(request: Request) -> handlerEquipoDB:
     return request.app.state.handler_equipo_db
 
 @router.get("/")
-async def lista_incidencia(request: Request):
+async def lista_equipo(request: Request):
     handler = get_handler(request)
 
     return handler.lista()
@@ -30,21 +29,19 @@ async def lista_incidencia(request: Request):
 @router.post("/")
 async def crear_equipo(payload:PutRequest, request:Request):
     handler = get_handler(request)
-
     result = handler.create(payload)
-
-    if result is None:
-        return HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
+    
     return JSONResponse({"id": result}, status.HTTP_201_CREATED)
 
 @router.get("/{equipo_id}/")
 async def get_by_id(equipo_id: int, request:Request):
     handler = get_handler(request)
-
     result = handler.get_by_id(equipo_id)
 
+    if not result:
+        return JSONResponse({"Error": "Ningun equipo fue encontrado"}, status_code=status.HTTP_404_NOT_FOUND)
     if result == None:
-        return HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
+        return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
     return Response(result.dict(), status.HTTP_200_OK)
 
@@ -53,7 +50,21 @@ async def update_equipo(equipo_id: int, payload: PutRequest, request: Request):
     handler = get_handler(request)
     result = handler.put(equipo_id, **payload.dict())
 
-    if result is None:
+    if not result:
         return JSONResponse({"Error": "Ningun equipo fue encontrado"}, status_code=status.HTTP_404_NOT_FOUND)
+    if result == None:
+        return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
     return JSONResponse({"Mensaje": "Editado con exito"}, status_code=status.HTTP_200_OK)
+
+@router.delete("/{equipo_id}/")
+async def borrar_equipo(equipo_id: int, request: Request):
+    handler = get_handler(request)
+    result = handler.delete(equipo_id)
+
+    if result is None:
+        return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    if not result:
+        return JSONResponse({"Error": "Ningun equipo fue encontrado"}, status_code=status.HTTP_404_NOT_FOUND)
+    
+    return JSONResponse({"Mensaje": f"Equipo {equipo_id} borrado"}, status_code=status.HTTP_200_OK)

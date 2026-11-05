@@ -20,7 +20,6 @@ def get_handler(request:Request) -> incidencias.handlerIncidenciaDB:
 @router.get("/")
 async def lista_tecnico(request: Request):
     handler = get_handler(request)
-
     return handler.lista()
 
 @router.post("/")
@@ -35,10 +34,12 @@ async def crear_tecnico(payload: PutRequest, request: Request):
 @router.get("/{tecnico_id}/")
 async def get_by_id(tecnico_id: int, request: Request):
     handler = get_handler(request)
-
     result = handler.get_by_id(tecnico_id)
-    if result is None:
-        return HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+    if not result:
+        return JSONResponse({"Error": "Ningun tecnico fue encontrado"}, status_code=status.HTTP_404_NOT_FOUND)
+    if result == None:
+        return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
     return JSONResponse(result, status.HTTP_200_OK)
 
@@ -49,8 +50,20 @@ async def update(tecnico_id: int, put_req: PutRequest, request: Request):
     result = handler.put(tecnico_id, **put_req.dict())
 
     if not result:
-        return HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+        return JSONResponse({"Error": "Ningun tecnico fue encontrado"}, status_code=status.HTTP_404_NOT_FOUND)
     elif result is None:
-        return JSONResponse({"Error": "Ningun tecnico fue encontrado"}, status_code=status.HTTP_304_NOT_MODIFIED)
+        return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
     return JSONResponse({"Mensaje": "Editado con exito"}, status_code=status.HTTP_200_OK)
+
+@router.delete("/{tecnico_id}/")
+async def borrar_incidencia(tecnico_id: int, request: Request):
+    handler = get_handler(request)
+    result = handler.delete(tecnico_id)
+
+    if result is None:
+        return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    if not result:
+        return JSONResponse({"Error": "Ningun tecnico fue encontrado"}, status_code=status.HTTP_404_NOT_FOUND)
+    
+    return JSONResponse({"Mensaje": f"Tecnico {tecnico_id} borrado"}, status_code=status.HTTP_200_OK)

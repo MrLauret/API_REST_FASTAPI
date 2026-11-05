@@ -128,7 +128,11 @@ Asigna un técnico existente a la incidencia. El cuerpo es:
 {"tecnico_id": 2}
 ```
 
-El campo `tecnico_id` también acepta `null` según el esquema de entrada. La respuesta prevista incluye la incidencia actualizada; la implementación actual debe revisarse para confirmar que la asignación y la respuesta se completen correctamente.
+El campo `tecnico_id` está definido como opcional en el esquema de entrada. La ruta devuelve el resultado del handler, que debería representar la incidencia actualizada.
+
+#### `DELETE /api/incidencias/{incidencia_id}/`
+
+Elimina una incidencia. Devuelve `200` con un mensaje de confirmación, `404` si no existe y `500` si ocurre un error en la base de datos.
 
 ### Equipos
 
@@ -161,6 +165,10 @@ Obtiene un equipo por identificador.
 
 Reemplaza los cuatro campos del equipo. Usa el mismo cuerpo que `POST`. Devuelve `200` si se actualiza y `404` si no se encuentra.
 
+#### `DELETE /api/equipos/{equipo_id}/`
+
+Elimina un equipo. Devuelve `200` con un mensaje de confirmación, `404` si no existe y `500` si ocurre un error en la base de datos.
+
 ### Técnicos
 
 Los campos de un técnico son `nombre`, `email` y `especialidad`.
@@ -190,6 +198,10 @@ Obtiene un técnico por identificador.
 #### `PUT /api/tecnicos/{tecnico_id}/`
 
 Reemplaza `nombre`, `email` y `especialidad`. Usa el mismo cuerpo que `POST`.
+
+#### `DELETE /api/tecnicos/{tecnico_id}/`
+
+Elimina un técnico. Devuelve `200` con un mensaje de confirmación, `404` si no existe y `500` si ocurre un error en la base de datos.
 
 ## Base de datos PostgreSQL
 
@@ -227,6 +239,8 @@ Cerrar una incidencia:
 curl -X PATCH http://127.0.0.1:8000/api/incidencias/1/cerrar/
 ```
 
-## Limitaciones conocidas
+Eliminar un técnico:
 
-- La API no expone rutas `DELETE`, aunque existan métodos de borrado en los handlers de base de datos.
+```bash
+curl -X DELETE http://127.0.0.1:8000/api/tecnicos/1/
+```

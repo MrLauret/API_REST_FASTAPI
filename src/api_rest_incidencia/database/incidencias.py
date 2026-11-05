@@ -18,7 +18,7 @@ class handlerIncidenciaDB:
             '''
             INSERT INTO incidencias
             (titulo, descripcion, prioridad, estado, equipo_id, tecnico_id, fecha_creacion, fecha_modificacion)
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
             RETURNING id''', 
             (
                 put_req.titulo,
@@ -53,10 +53,10 @@ class handlerIncidenciaDB:
     def put(self, id, titulo:str, descripcion:str, prioridad:str, estado:str, equipo_id, tecnico_id) -> bool | errors.NoEquipo | errors.NoTecnico:
         try:
             if not equipos.handlerEquipoDB(self.conn).get_by_id(equipo_id): 
-                return errors.NoEquipo
+                return errors.NoEquipo()
             
             if type(tecnico_id) != None and not tecnicos.handlerTecnicoDB(self.conn).get_by_id(tecnico_id):
-                return errors.NoTecnico
+                return errors.NoTecnico()
 
             self.cursor.execute('''
                 UPDATE incidencias
