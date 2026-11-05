@@ -2,7 +2,7 @@ from api_rest_incidencia.models.equipo import Equipo
 from sqlite3 import Connection
 import logging
 
-class HanddlerEquipoDB:
+class handlerEquipoDB:
     def __init__(self, conn:Connection):
         self.conn = conn
         self.cursor = conn.cursor()
@@ -65,3 +65,10 @@ class HanddlerEquipoDB:
         except Exception as e:
             logging.error(f'Error en la base de datos {e}')
             return None
+
+    def lista(self):
+        self.cursor.execute('''
+            SELECT * FROM tecnicos;
+        ''')
+
+        return self.cursor.fetchall()

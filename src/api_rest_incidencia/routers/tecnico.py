@@ -14,13 +14,19 @@ class PutRequest(BaseModel):
     email: str
     especialidad: str
 
-def get_handler(request:Request) -> incidencias.HanddlerIncidenciaDB:
-    return request.app.state.handdler_tecnico_db
+def get_handler(request:Request) -> incidencias.handlerIncidenciaDB:
+    return request.app.state.handler_tecnico_db
+
+@router.get("/")
+async def lista_tecnico(request: Request):
+    handler = get_handler(request)
+
+    return handler.lista()
 
 @router.post("/")
 async def crear_tecnico(payload: PutRequest, request: Request):
-    handdler = get_handler(request)
-    result = handdler.create(payload)
+    handler = get_handler(request)
+    result = handler.create(payload)
 
     if result is None:
         return HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
@@ -28,9 +34,9 @@ async def crear_tecnico(payload: PutRequest, request: Request):
 
 @router.get("/{tecnico_id}/")
 async def get_by_id(tecnico_id: int, request: Request):
-    handdler = get_handler(request)
+    handler = get_handler(request)
 
-    result = handdler.get_by_id(tecnico_id)
+    result = handler.get_by_id(tecnico_id)
     if result is None:
         return Response(status_code=status.HTTP_404_NOT_FOUND)
     
@@ -42,8 +48,8 @@ async def get_by_id(tecnico_id: int, request: Request):
 @router.put("/{tecnico_id}/")
 async def update(tecnico_id: int, put_req: PutRequest, request: Request):
 
-    handdler = get_handler(request)
-    result = handdler.put(tecnico_id, **put_req.dict())
+    handler = get_handler(request)
+    result = handler.put(tecnico_id, **put_req.dict())
 
     if not result:
         return Response(status_code=status.HTTP_404_NOT_FOUND)
@@ -59,4 +65,4 @@ async def update(tecnico_id: int, put_req: PutRequest, request: Request):
         return Response(result.to_dict(), status.HTTP_200_OK)
     else:
         return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    return Response(result.to_dict(), status.HTTP_200_OK)
+    return JSONResponse({"Mensaje": "Editado con exito"}, status_code=status.HTTP_200_OK)

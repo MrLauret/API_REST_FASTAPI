@@ -2,7 +2,7 @@ from api_rest_incidencia.models.tecnico import Tecnico
 from sqlite3 import Connection
 import logging
 
-class HanddlerTecnicoDB:
+class handlerTecnicoDB:
     def __init__(self, conn:Connection):
         self.conn = conn
         self.cursor = conn.cursor()
@@ -66,3 +66,10 @@ class HanddlerTecnicoDB:
         except Exception as e:
             logging.error(f'Error en la base de datos {e}')
             return None
+
+    def lista(self):
+        self.cursor.execute('''
+            SELECT * FROM tecnicos;
+        ''')
+
+        return self.cursor.fetchall()

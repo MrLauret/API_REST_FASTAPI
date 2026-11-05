@@ -22,13 +22,19 @@ class PutRequest(BaseModel):
     equipo_id: int
     tecnico_id: int | None
 
-def get_handler(request:Request) -> incidencias.HanddlerIncidenciaDB:
-    return request.app.state.handdler_incidencia_db
+def get_handler(request:Request) -> incidencias.handlerIncidenciaDB:
+    return request.app.state.handler_incidencia_db
+
+@router.get("/")
+async def lista_incidencia(request: Request):
+    handler = get_handler(request)
+
+    return handler.lista()
 
 @router.post("/")
 async def crear_incidencia(payload:PutRequest, request:Request):
-    handdler = get_handler(request)
-    result = handdler.create(payload)
+    handler = get_handler(request)
+    result = handler.create(payload)
 
     if isinstance(result, NoEquipo):
         return JSONResponse(content={"Error": "Ningun equipo fue encontrado"}, status_code=status.HTTP_404_NOT_FOUND)
@@ -37,12 +43,12 @@ async def crear_incidencia(payload:PutRequest, request:Request):
 
 @router.get("/{incidencia_id}/")
 async def get_by_id(incidencia_id: int, request:Request):
-    handdler = get_handler(request)
+    handler = get_handler(request)
 
-    result = handdler.get_by_id(incidencia_id)
+    result = handler.get_by_id(incidencia_id)
 
     if result is None:
-        return JSONResponse(content=None, status_code=status.HTTP_404_NOT_FOUND)
+        return JSONResponse({"Error": "Ninguna incidecia fue encontrada"}, status_code=status.HTTP_404_NOT_FOUND)
     
     if hasattr(result, "to_dict") and callable(result.to_dict):
         return JSONResponse(content=result.to_dict(), status_code=status.HTTP_200_OK)
@@ -57,8 +63,8 @@ async def update(incidencia_id: int, put_req:PutRequest, request:Request):
     elif not Prioridad.check_valido(put_req.prioridad):
         return JSONResponse(content={"error": "Prioridad debe ser 'Baja', 'Media', 'Alta', 'Critica'"}, status_code=status.HTTP_400_BAD_REQUEST)
 
-    handdler = get_handdler(request)
-    result = handdler.put(incidencia_id, **put_req.dict())
+    handler = get_handler(request)
+    result = handler.put(incidencia_id, **put_req.dict())
 
     if isinstance(result, NoEquipo):
         return JSONResponse(content={"Error": "Ningun equipo fue encontrado"}, status_code=status.HTTP_404_NOT_FOUND)
@@ -67,30 +73,30 @@ async def update(incidencia_id: int, put_req:PutRequest, request:Request):
         return JSONResponse(content={"Error": "Ningun tecnico fue encontrado"}, status_code=status.HTTP_404_NOT_FOUND)
 
     if result is None:
-        return JSONResponse(content=None, status_code=status.HTTP_404_NOT_FOUND)
+        return JSONResponse({"Error": "Ninguna incidecia fue encontrada"}, status_code=status.HTTP_404_NOT_FOUND)
     
-    return JSONResponse(content=result.to_dict(), status_code=status.HTTP_200_OK)
+    return JSONResponse({"Mensaje": "Editado con exito"}, status_code=status.HTTP_200_OK)
 
 @router.patch("/{incidencia_id}/cerrar/")
 async def cerrar_incidencia(incidencia_id: int, request:Request):
-    handdler = get_handler(request)
+    handler = get_handler(request)
 
-    result = handdler.cerrar(incidencia_id)
+    result = handler.cerrar(incidencia_id)
 
     if result is None:
-        return JSONResponse(content=None, status_code=status.HTTP_404_NOT_FOUND)
+        return JSONResponse({"Error": "Ninguna incidecia fue encontrada"}, status_code=status.HTTP_404_NOT_FOUND)
     
-    return JSONResponse(content=result.to_dict(), status_code=status.HTTP_200_OK)
+    return JSONResponse({"Mensaje": "Incidencia cerrada correctamente"}, status_code=status.HTTP_200_OK)
 
 @router.patch("/{incidencia_id}/asignar_tecnico/")
 async def asignar_tecnico(incidencia_id: int, payload: AsignarTecnico, request:Request):
-    handdler = get_handler(request)
+    handler = get_handler(request)
 
-    result = handdler.asignar_tecnico(incidencia_id, payload.tecnico_id)
+    result = handler.asignar_tecnico(incidencia_id, payload.tecnico_id)
 
     if isinstance(result, NoTecnico):
         return JSONResponse(content={"Error": "Ningun tecnico fue encontrado"}, status_code=status.HTTP_304_NOT_MODIFIED)
     if result is None:
-        return JSONResponse(content=None, status_code=status.HTTP_404_NOT_FOUND)
+        return JSONResponse({"Error": "Ninguna incidecia fue encontrada"}, status_code=status.HTTP_404_NOT_FOUND)
     
     return JSONResponse(content=result.to_dict(), status_code=status.HTTP_200_OK)

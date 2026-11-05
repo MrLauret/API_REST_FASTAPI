@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-class Tecnico(BaseModel):
+class Tecnico():
     def __init__(self, id:int, nombre:str, email:str, especialidad:str):
         self.id = id
         self.nombre = nombre

@@ -2,7 +2,7 @@ from fastapi import APIRouter, Request, Response, status
 from fastapi.responses import JSONResponse
 from api_rest_incidencia.database import equipos
 from api_rest_incidencia.models.equipo import Equipo
-from api_rest_incidencia.database.equipos import HanddlerEquipoDB
+from api_rest_incidencia.database.equipos import handlerEquipoDB
 from pydantic import BaseModel
 
 router = APIRouter(
@@ -18,14 +18,20 @@ class PutRequest(BaseModel):
 
 
 
-def get_handler(request: Request) -> HanddlerEquipoDB:
-    return request.app.state.handdler_equipo_db
+def get_handler(request: Request) -> handlerEquipoDB:
+    return request.app.state.handler_equipo_db
+
+@router.get("/")
+async def lista_incidencia(request: Request):
+    handler = get_handler(request)
+
+    return handler.lista()
 
 @router.post("/")
 async def crear_equipo(payload:PutRequest, request:Request):
-    handdler = get_handler(request)
+    handler = get_handler(request)
 
-    result = handdler.create(payload)
+    result = handler.create(payload)
 
     if result is None:
         return HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
@@ -33,21 +39,21 @@ async def crear_equipo(payload:PutRequest, request:Request):
 
 @router.get("/{equipo_id}/")
 async def get_by_id(equipo_id: int, request:Request):
-    handdler = get_handler(request)
+    handler = get_handler(request)
 
-    result = handdler.get_by_id(equipo_id)
+    result = handler.get_by_id(equipo_id)
 
     if result == None:
-        return Response(None, status.HTTP_404_NOT_FOUND)
+        return HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
     
     return Response(result.dict(), status.HTTP_200_OK)
 
 @router.put("/{equipo_id}/")
 async def update_equipo(equipo_id: int, payload: PutRequest, request: Request):
-    handdler = get_handler(request)
-    result = handdler.put(equipo_id, **payload.dict())
+    handler = get_handler(request)
+    result = handler.put(equipo_id, **payload.dict())
 
     if result is None:
-        return Response(None, status.HTTP_404_NOT_FOUND)
+        return JSONResponse({"Error": "Ningun equipo fue encontrado"}, status_code=status.HTTP_404_NOT_FOUND)
     
-    return Response(result.dict(), status.HTTP_200_OK)
+    return JSONResponse({"Mensaje": "Editado con exito"}, status_code=status.HTTP_200_OK)

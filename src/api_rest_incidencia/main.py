@@ -25,9 +25,9 @@ async def lifespan(app: FastAPI):
     cursor = conn.cursor()
     database.db_migrate(cursor)
     
-    app.state.handdler_incidencia_db = database.incidencias.HanddlerIncidenciaDB(conn)
-    app.state.handdler_equipo_db = database.equipos.HanddlerEquipoDB(conn)
-    app.state.handdler_tecnico_db = database.tecnicos.HanddlerTecnicoDB(conn)
+    app.state.handler_incidencia_db = database.incidencias.handlerIncidenciaDB(conn)
+    app.state.handler_equipo_db = database.equipos.handlerEquipoDB(conn)
+    app.state.handler_tecnico_db = database.tecnicos.handlerTecnicoDB(conn)
     
     yield
     

@@ -4,14 +4,14 @@ from api_rest_incidencia.database import equipos, tecnicos
 import datetime
 import logging
 
-class HanddlerIncidenciaDB:
+class handlerIncidenciaDB:
     def __init__(self, conn:Connection):
         self.conn = conn
         self.cursor = conn.cursor()
 
     def create(self, put_req):
 
-        if equipos.HanddlerEquipoDB(self.conn).get_by_id(put_req.equipo_id) == None: 
+        if equipos.handlerEquipoDB(self.conn).get_by_id(put_req.equipo_id) == None: 
             return errors.NoEquipo()
 
         self.cursor.execute(
@@ -51,10 +51,10 @@ class HanddlerIncidenciaDB:
     
     def put(self, id, titulo:str, descripcion:str, prioridad:str, estado:str, equipo_id, tecnico_id) -> bool | errors.NoEquipo | errors.NoTecnico:
         try:
-            if not equipos.HanddlerEquipoDB(self.conn).get_by_id(equipo_id): 
+            if not equipos.handlerEquipoDB(self.conn).get_by_id(equipo_id): 
                 return errors.NoEquipo
             
-            if type(tecnico_id) != None and not tecnicos.HanddlerTecnicoDB(self.conn).get_by_id(tecnico_id):
+            if type(tecnico_id) != None and not tecnicos.handlerTecnicoDB(self.conn).get_by_id(tecnico_id):
                 return errors.NoTecnico
 
             self.cursor.execute('''
@@ -117,7 +117,7 @@ class HanddlerIncidenciaDB:
     
     def asignar_tecnico(self, id, id_tecnico) -> bool | errors.NoTecnico:
         try:
-            if not tecnicos.HanddlerTecnicoDB(self.conn).get_by_id(id_tecnico):
+            if not tecnicos.handlerTecnicoDB(self.conn).get_by_id(id_tecnico):
                 return errors.NoTecnico()
 
             self.cursor.execute('''
@@ -135,6 +135,13 @@ class HanddlerIncidenciaDB:
         except Exception as e:
             logging.error(f'Error en la base de datos {e} el {self.fecha_actual()}')
             return None
+    
+    def lista(self):
+        self.cursor.execute('''
+            SELECT * FROM incidencias;
+        ''')
+
+        return self.cursor.fetchall()
     
     @staticmethod
     def fecha_actual():
