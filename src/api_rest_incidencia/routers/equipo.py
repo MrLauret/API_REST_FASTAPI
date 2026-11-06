@@ -43,12 +43,12 @@ async def get_by_id(equipo_id: int, request:Request):
     if result == None:
         return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
-    return Response(result.dict(), status.HTTP_200_OK)
+    return JSONResponse(result, status.HTTP_200_OK)
 
 @router.put("/{equipo_id}/")
 async def update_equipo(equipo_id: int, payload: PutRequest, request: Request):
     handler = get_handler(request)
-    result = handler.put(equipo_id, **payload.dict())
+    result = handler.put(equipo_id, **payload.model_dump())
 
     if not result:
         return JSONResponse({"Error": "Ningun equipo fue encontrado"}, status_code=status.HTTP_404_NOT_FOUND)

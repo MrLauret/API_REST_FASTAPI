@@ -55,6 +55,32 @@ La API estará disponible en `http://127.0.0.1:8000`. FastAPI publica la documen
 
 Al iniciar la aplicación, se conecta a PostgreSQL y ejecuta los archivos SQL de `src/api_rest_incidencia/database/migrations/` en orden alfabético. Las tablas se crean si no existen.
 
+## Pruebas
+
+El proyecto incluye pruebas automatizadas bajo `tests/api` para validar los endpoints principales de la API usando `pytest` y un fixture mock para evitar depender directamente de PostgreSQL durante la ejecución de la prueba.
+
+Para ejecutar la batería completa:
+
+```bash
+cd /home/user/Documents/Programming/API_REST_Incidencia
+. .venv/bin/activate
+python -m pytest tests/api -q
+```
+
+También puedes lanzar un archivo concreto:
+
+```bash
+python -m pytest tests/api/test_tecnicos.py -q
+python -m pytest tests/api/test_equipos.py -q
+python -m pytest tests/api/test_incidencias.py -q
+```
+
+Las pruebas cubren:
+
+- listado, detalle, creación, actualización y borrado de técnicos
+- listado, detalle, creación, actualización y borrado de equipos
+- listado, detalle, creación, actualización, borrado, cierre y asignación de técnicos a incidencias
+
 ## Convenciones de la API
 
 - Los recursos se sirven bajo `/api` y las rutas terminan en `/`.

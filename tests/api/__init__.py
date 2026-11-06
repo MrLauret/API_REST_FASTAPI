@@ -1,0 +1,1 @@
+from tests.api import test_equipos, test_tecnicos, test_incidencias

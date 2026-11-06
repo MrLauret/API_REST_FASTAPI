@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Request, status, Response
 from fastapi.responses import JSONResponse
+from fastapi.exceptions import HTTPException
 from api_rest_incidencia.database import incidencias
 from api_rest_incidencia.models.errors import *
 from api_rest_incidencia.models.incidencia import Incidencia, Prioridad, Estado
@@ -48,9 +49,8 @@ async def get_by_id(incidencia_id: int, request:Request):
     if not result:
         return JSONResponse({"Error": "Ninguna incidecia fue encontrada"}, status_code=status.HTTP_404_NOT_FOUND)
     
-    if hasattr(result, "to_dict") and callable(result.to_dict):
-        return JSONResponse(content=result.to_dict(), status_code=status.HTTP_200_OK)
-    return JSONResponse(content={"error": "Result object does not implement to_dict()"}, status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    return JSONResponse(content=result, status_code=status.HTTP_200_OK)
 
 @router.put("/{incidencia_id}/")
 async def update(incidencia_id: int, put_req:PutRequest, request:Request):
@@ -62,7 +62,7 @@ async def update(incidencia_id: int, put_req:PutRequest, request:Request):
         return JSONResponse(content={"error": "Prioridad debe ser 'Baja', 'Media', 'Alta', 'Critica'"}, status_code=status.HTTP_400_BAD_REQUEST)
 
     handler = get_handler(request)
-    result = handler.put(incidencia_id, **put_req.dict())
+    result = handler.put(incidencia_id, **put_req.model_dump())
 
     if isinstance(result, NoEquipo):
         return JSONResponse(content={"Error": "Ningun equipo fue encontrado"}, status_code=status.HTTP_404_NOT_FOUND)
@@ -97,7 +97,7 @@ async def asignar_tecnico(incidencia_id: int, payload: AsignarTecnico, request:R
     if not result:
         return JSONResponse({"Error": "Ninguna incidecia fue encontrada"}, status_code=status.HTTP_404_NOT_FOUND)
     
-    return JSONResponse(content=result, status_code=status.HTTP_200_OK)
+    return JSONResponse({"Mensaje": "Tecnico asignado a incidencia"}, status_code=status.HTTP_200_OK)
 
 @router.delete("/{incidencia_id}/")
 async def borrar_incidencia(incidencia_id: int, request: Request):

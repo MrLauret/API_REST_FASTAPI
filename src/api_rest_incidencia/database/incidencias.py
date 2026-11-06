@@ -132,6 +132,8 @@ class handlerIncidenciaDB:
                 return False
             
             self.cursor.commit()
+            logging.info(f"Tecnico con id {id_tecnico} asignado a incidencia {id}")
+            return True
 
         except Exception as e:
             logging.error(f'Error en la base de datos {e} el {self.fecha_actual()}')

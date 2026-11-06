@@ -47,7 +47,7 @@ async def get_by_id(tecnico_id: int, request: Request):
 async def update(tecnico_id: int, put_req: PutRequest, request: Request):
 
     handler = get_handler(request)
-    result = handler.put(tecnico_id, **put_req.dict())
+    result = handler.put(tecnico_id, **put_req.model_dump())
 
     if not result:
         return JSONResponse({"Error": "Ningun tecnico fue encontrado"}, status_code=status.HTTP_404_NOT_FOUND)
