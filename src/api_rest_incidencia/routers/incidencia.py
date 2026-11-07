@@ -93,7 +93,7 @@ async def asignar_tecnico(incidencia_id: int, payload: AsignarTecnico, request:R
     result = handler.asignar_tecnico(incidencia_id, payload.tecnico_id)
 
     if isinstance(result, NoTecnico):
-        return JSONResponse(content={"Error": "Ningun tecnico fue encontrado"}, status_code=status.HTTP_304_NOT_MODIFIED)
+        return JSONResponse(content={"Error": "Ningun tecnico fue encontrado"}, status_code=status.HTTP_404_NOT_FOUND)
     if not result:
         return JSONResponse({"Error": "Ninguna incidecia fue encontrada"}, status_code=status.HTTP_404_NOT_FOUND)
     
