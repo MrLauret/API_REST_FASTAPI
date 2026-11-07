@@ -131,7 +131,7 @@ class handlerIncidenciaDB:
                 self.cursor.rollback()
                 return False
             
-            self.cursor.commit()
+            self.conn.commit()
             logging.info(f"Tecnico con id {id_tecnico} asignado a incidencia {id}")
             return True
 
