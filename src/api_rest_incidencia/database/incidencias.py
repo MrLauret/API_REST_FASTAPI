@@ -55,7 +55,7 @@ class handlerIncidenciaDB:
             if not equipos.handlerEquipoDB(self.conn).get_by_id(equipo_id): 
                 return errors.NoEquipo()
             
-            if type(tecnico_id) != None and not tecnicos.handlerTecnicoDB(self.conn).get_by_id(tecnico_id):
+            if type(tecnico_id) is not None and not tecnicos.handlerTecnicoDB(self.conn).get_by_id(tecnico_id):
                 return errors.NoTecnico()
 
             self.cursor.execute('''
