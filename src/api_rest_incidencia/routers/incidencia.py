@@ -83,7 +83,7 @@ async def cerrar_incidencia(incidencia_id: int, request:Request):
     if not result:
         return JSONResponse({"Error": "Ninguna incidecia fue encontrada"}, status_code=status.HTTP_404_NOT_FOUND)
     if result == None:
-        return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
     return JSONResponse({"Mensaje": "Incidencia cerrada correctamente"}, status_code=status.HTTP_200_OK)
 
@@ -105,7 +105,7 @@ async def borrar_incidencia(incidencia_id: int, request: Request):
     result = handler.delete(incidencia_id)
 
     if result is None:
-        return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
     if not result:
         return JSONResponse({"Error": "Ninguna incidecia fue encontrada"}, status_code=status.HTTP_404_NOT_FOUND)
     
