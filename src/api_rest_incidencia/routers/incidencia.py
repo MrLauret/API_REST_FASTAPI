@@ -33,6 +33,12 @@ async def lista_incidencia(request: Request):
 
 @router.post("/")
 async def crear_incidencia(payload:PutRequest, request:Request):
+    if not Estado.check_valido(payload.estado):
+        return JSONResponse(content={"error": "Estado debe ser 'Abierta', 'En proceso', 'Cerrada'"}, status_code=status.HTTP_400_BAD_REQUEST)
+
+    elif not Prioridad.check_valido(payload.prioridad):
+        return JSONResponse(content={"error": "Prioridad debe ser 'Baja', 'Media', 'Alta', 'Critica'"}, status_code=status.HTTP_400_BAD_REQUEST)
+    
     handler = get_handler(request)
     result = handler.create(payload)
 
@@ -53,16 +59,16 @@ async def get_by_id(incidencia_id: int, request:Request):
     return JSONResponse(content=result, status_code=status.HTTP_200_OK)
 
 @router.put("/{incidencia_id}/")
-async def update(incidencia_id: int, put_req:PutRequest, request:Request):
+async def update(incidencia_id: int, payload:PutRequest, request:Request):
 
-    if not Estado.check_valido(put_req.estado):
+    if not Estado.check_valido(payload.estado):
         return JSONResponse(content={"error": "Estado debe ser 'Abierta', 'En proceso', 'Cerrada'"}, status_code=status.HTTP_400_BAD_REQUEST)
 
-    elif not Prioridad.check_valido(put_req.prioridad):
+    elif not Prioridad.check_valido(payload.prioridad):
         return JSONResponse(content={"error": "Prioridad debe ser 'Baja', 'Media', 'Alta', 'Critica'"}, status_code=status.HTTP_400_BAD_REQUEST)
 
     handler = get_handler(request)
-    result = handler.put(incidencia_id, **put_req.model_dump())
+    result = handler.put(incidencia_id, **payload.model_dump())
 
     if isinstance(result, NoEquipo):
         return JSONResponse(content={"Error": "Ningun equipo fue encontrado"}, status_code=status.HTTP_404_NOT_FOUND)
