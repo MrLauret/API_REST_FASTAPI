@@ -67,7 +67,7 @@ class handlerIncidenciaDB:
             )
 
             if self.cursor.rowcount == 0:
-                self.cursor.rollback()
+                self.conn.rollback()
                 return False
 
             self.conn.commit()
@@ -85,7 +85,7 @@ class handlerIncidenciaDB:
             ''', (id,))
 
             if self.cursor.rowcount == 0:
-                self.cursor.rollback()
+                self.conn.rollback()
                 return False
             
             self.conn.commit()
@@ -105,7 +105,7 @@ class handlerIncidenciaDB:
             ''', (self.fecha_actual(), id,))
 
             if self.cursor.rowcount == 0:
-                self.cursor.rollback()
+                self.conn.rollback()
                 return False
             
             self.conn.commit()
@@ -128,7 +128,7 @@ class handlerIncidenciaDB:
             ''', (self.fecha_actual(), id_tecnico, id,))
 
             if self.cursor.rowcount == 0:
-                self.cursor.rollback()
+                self.conn.rollback()
                 return False
             
             self.conn.commit()
